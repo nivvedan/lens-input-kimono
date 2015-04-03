@@ -3,23 +3,23 @@
 
 
 <!--
-Simple API component to make API calls. If the API returns JSON with a header followed by an array of results, it will return the first array. Flattens the results to be one level deep, and sends the reuslts to <code>output</code>
+Lenses input component to make API queries from Kimono labs (https://www.kimonolabs.com/). You must already have an account with Kimono Labs and must have generated an API on Kimono Labs to be able to use this component.
 
 ##### Example
 
-    <lens-input-simple-api url="http://api.openweathermap.org/data/2.5/weather?q=New+York&units=imperial"></lens-input-simple-api>
+    <lens-input-kimono url="http://api.openweathermap.org/data/2.5/weather?q=New+York&units=imperial"></lens-input-kimono>
 
-@element lens-input-simple-api
-@blurb Simple API component to make API calls.
+@element lens-input-kimono
+@blurb Input Component to make API calls from Kimono Labs
 @status alpha
-@homepage http://lenses.github.io/lens-input-simple-api
+@homepage http://lenses.github.io/lens-input-kimono
 -->
 
-<polymer-element name="lens-input-simple-api" attributes="url output outputRaw minRows">
+<polymer-element name="lens-input-kimono" attributes="url output outputRaw minRows">
   <template>
-    <link rel="stylesheet" href="lens-input-simple-api.css">
+    <link rel="stylesheet" href="lens-input-kimono.css">
     <div class="lens-container">
-      <div><label class="label">API URL: </label><input is="core-input" value="{{url}}"></div>
+      <div><label class="label">Kimono API Key: </label><input is="core-input" value="{{url}}"></div>
       <div><label class="label">Expect at least <input class="count" is="core-input" value="{{minRows}}"> datapoints.</label></div>
 
       <div><label class="label">Num Records: </label><div class="data">{{output.length}}</div></div>
@@ -100,7 +100,7 @@ Simple API component to make API calls. If the API returns JSON with a header fo
             var method = 'GET';
             var xhr = new XMLHttpRequest();
             if ("withCredentials" in xhr) {
-              xhr.open(method, url, true);
+              xhr.open(method, "http://makelenses.com:8000/www.kimonolabs.com/api/9c80fq2s?apikey=" + url, true);
             } else if (typeof XDomainRequest != "undefined") {
               xhr = new XDomainRequest();
               xhr.open(method, url);
