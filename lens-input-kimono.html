@@ -7,7 +7,9 @@ Lenses input component to make API queries from Kimono labs (https://www.kimonol
 
 ##### Example
 
-    <lens-input-kimono url="http://api.openweathermap.org/data/2.5/weather?q=New+York&units=imperial"></lens-input-kimono>
+    <lens-input-kimono apiId="9c80fq2s" apiKey="mFzZTY0IGlzIGEgZ2VuZXJpYyB0ZXJtI"></lens-input-kimono>
+    OR
+    <lens-input-kimono url="https://www.kimonolabs.com/api/9c80fq2s?apikey=mFzZTY0IGlzIGEgZ2VuZXJpYyB0ZXJtI"></lens-input-kimono>
 
 @element lens-input-kimono
 @blurb Input Component to make API calls from Kimono Labs
@@ -15,12 +17,14 @@ Lenses input component to make API queries from Kimono labs (https://www.kimonol
 @homepage http://lenses.github.io/lens-input-kimono
 -->
 
-<polymer-element name="lens-input-kimono" attributes="url output outputRaw minRows">
+<polymer-element name="lens-input-kimono" attributes="url apiKey apiId output outputRaw minRows">
   <template>
     <link rel="stylesheet" href="lens-input-kimono.css">
     <div class="lens-container">
-      <div><label class="label">Kimono API Key: </label><input is="core-input" value="{{url}}"></div>
-      <div><label class="label">Expect at least <input class="count" is="core-input" value="{{minRows}}"> datapoints.</label></div>
+      <div><label class="label">Kimono API ID: </label><input is="core-input" value="{{apiId}}"></div>
+      <div><label class="label">Kimono API Key: </label><input is="core-input" value="{{apiKey}}"></div>
+      <p>OR</p>
+      <div><label class="label">Kimono API URL: </label><input is="core-input" value="{{url}}"></div>
 
       <div><label class="label">Num Records: </label><div class="data">{{output.length}}</div></div>
     </div>
@@ -53,7 +57,25 @@ Lenses input component to make API queries from Kimono labs (https://www.kimonol
        *  @type string
        *  @default null
        */
-      url: null,//'https://api.enigma.io/v2/data/iTX3qf5cwspm7ryII3ii5zqeHqUuoO4MctfLJFf2xU8eletxHvcI4/us.gov.atf.federal-firearms-licenses.complete-listing',
+      url: null,
+
+      /**
+       *  API Key of the Kimono Labs user account
+       *  
+       *  @property apiKey
+       *  @type string
+       *  @default null
+       */
+      apiKey: null,
+ 
+       /**
+       *  The ID of the API the Kimono Labs user has created
+       *  
+       *  @property apiId
+       *  @type string
+       *  @default null
+       */     
+      apiId: null,
 
       /**
        * Minimum number of rows to expect in the result data, otherwise ignores it
@@ -62,17 +84,19 @@ Lenses input component to make API queries from Kimono labs (https://www.kimonol
       minRows: 1,
 
       observe: {
-        minRows: "queryData"
+        minRows: "queryData",
+        minRows: "queryDataWithUrl"
       },
 
       domReady: function() {
-
           var self = this;
 
-          if(this.url) {
+          if(this.apiKey && this.apiId) {
             self.queryData();
           }
-
+          else if(this.url) {
+            self.queryDataWithUrl();
+          }
       }, 
 
       /**
@@ -81,26 +105,55 @@ Lenses input component to make API queries from Kimono labs (https://www.kimonol
        *  @method queryData
        */
       queryData: function() {
+          var self = this;
+          var apiKey = self.apiKey;
+          var apiId = self.apiId;
+          
+          self._makeCORSCall(apiId, apiKey);
 
+      },
 
+      /**
+       *  Query the API with an URL, flatten results, and set <code>output</code>.
+       *  
+       *  @method queryDataWithUrl
+       */
+      queryDataWithUrl: function() {
           var self = this;
           var url = self.url;
-          
-          self._makeCORSCall(url);
+
+          var parser = document.createElement('a');
+          parser.href = url;
+
+          if (parser.hostname == "www.kimonolabs.com" || parser.hostname == "kimonolabs.com") {
+            var apiId = parser.pathname.split('/')[2]
+            var apiKey = parser.search.split('=')[1]
+            if (typeof apiKey != 'undefined' && typeof apiKey != 'undefined') {
+              self._makeCORSCall(apiId, apiKey);
+            }
+          }
 
       },
 
       urlChanged: function() {
+        this.queryDataWithUrl();
+      },
+
+      apiIdChanged: function() {
         this.queryData();
       },
 
-      _makeCORSCall: function(url) {
+      apiKeyChanged: function() {
+        this.queryData();
+      },
+
+      _makeCORSCall: function(apiId, apiKey) {
 
             var self = this;
             var method = 'GET';
             var xhr = new XMLHttpRequest();
             if ("withCredentials" in xhr) {
-              xhr.open(method, "http://makelenses.com:8000/www.kimonolabs.com/api/9c80fq2s?apikey=" + url, true);
+              xhr.open(method, "http://makelenses.com:8000/www.kimonolabs.com/api/" + apiId + "?apikey=" + apiKey, true);
             } else if (typeof XDomainRequest != "undefined") {
               xhr = new XDomainRequest();
               xhr.open(method, url);
@@ -175,8 +228,6 @@ Lenses input component to make API queries from Kimono labs (https://www.kimonol
                     isEmpty = false;
                     recurse(cur[p], prop ? prop+"."+p : p);
                 }
-                // if (isEmpty && prop)
-                //     result[prop] = {};
             }
         }
         recurse(data, "");

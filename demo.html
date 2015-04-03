@@ -59,12 +59,14 @@
     <template id="auto-bind-demo" is="auto-binding">
 
 
-    <p>This is a Simple API component to make API calls. If the API returns JSON with a header followed by an array of results, it will return the first array. Results will be flattened to one level deep.</p>
+    <p>Lenses input component to make API queries from <a href="https://www.kimonolabs.com/">Kimono labs</a>. You must already have an account with Kimono Labs and must have generated an API on Kimono Labs to be able to use this component.</p>
 
-    <p> Enter the URL to make an API call, for example :</p>
-    <pre>https://api.enigma.io/v2/data/iTX3qf5cwspm7ryII3ii5zqeHqUuoO4MctfLJFf2xU8eletxHvcI4/us.gov.atf.federal-firearms-licenses.complete-listing?limit=200</pre>
-    <p>or</p>
-    <pre>http://api.openweathermap.org/data/2.5/weather?q=New+York&units=imperial</pre>
+    <p> You need to enter the API ID and API Key to query your data from Kimono Labs. For example, if your Kimono API URL is</p>
+    <pre style="max-width:600px;">https://www.kimonolabs.com/api/9c80fq2s?apikey=mFzZTY0IGlzIGEgZ2VuZXJpYyB0ZXJtI</pre>
+    <p>the API ID and the API Key are as follows:</p>
+    <p>API ID: <pre>9c80fq2s</pre></p>
+    <p>API Key: <pre>mFzZTY0IGlzIGEgZ2VuZXJpYyB0ZXJtI</pre></p>
+
       <section class="component">
         <label>Component:</label>
           <lens-input-kimono id="component" output="{{myoutput}}" outputRaw="{{myoutputRaw}}"></lens-input-kimono>
@@ -84,17 +86,6 @@
         PolymerExpressions.prototype.json = function(object) {
           return JSON.stringify(object, undefined, 2);
         };
-        /*
-        component.urlChanged = function() {
-          component.queryData(function(xhr) {
-
-              // parse data and display the result of the API call
-              var data = JSON.parse(xhr.response);
-              console.log(data);
-              input.innerHTML = JSON.stringify(data, undefined, 2);
-          })
-        }
-        */
 
       </script>
 
